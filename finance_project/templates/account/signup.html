@@ -17,17 +17,17 @@
   {% csrf_token %}
 
   <div class="mb-4">
-    {{ form.username|add_label_class:"text-white mb-4" }}
+    {{ form.username|add_label_class:"text-white mb-4" }} {{form.errors.username.as_text}}
     {% render_field form.username class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %}
   </div>
 
   <div class="mb-4">
-    {{ form.password1|add_label_class:"text-white mb-2" }}
+    {{ form.password1|add_label_class:"text-white mb-2" }} {{form.errors.password1.as_text}}
     {% render_field form.password1 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %}
   </div>
 
   <div class="mb-4">
-    {{ form.password2|add_label_class:"text-white mb-2" }}
+    {{ form.password2|add_label_class:"text-white mb-2" }} {{form.errors.password2.as_text}}
     {% render_field form.password2 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %}
   </div>
 

@@ -15,4 +15,9 @@ def transaction_list(request):
         queryset=Transaction.objects.filter(user=request.user)
     )
     context = {'filter' : transaction_filter}
+
+    # htmx 요청이 있는 경우, 템플릿의 일부분만 반환 
+    if request.htmx:
+        return render(request, 'tracker/particials/transaction-container.html', context)
+    
     return render(request, 'tracker/transaction-list.html', context)

@@ -12,7 +12,7 @@ def transaction_list(request):
     # transactions = Transaction.objects.filter(user = request.user)
     transaction_filter = TransactionFilter(
         request.GET,
-        queryset=Transaction.objects.filter(user=request.user)
+        queryset=Transaction.objects.filter(user=request.user).select_related('category')
     )
     context = {'filter' : transaction_filter}
 

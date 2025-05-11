@@ -32,9 +32,6 @@ class TransactionFactory(factory.django.DjangoModelFactory):
         start_date = datetime(year=2022, month=1, day=1).date(),
         end_date=datetime.now().date()
     )
-    type = factory.Faker(
-        'random_element',
-        elements=[
-            x[0] for x in Transaction.TRANSACTION_TYPE_CHOICE
-        ]
+    type = factory.Iterator(
+        [x[0] for x in Transaction.TRANSACTION_TYPE_CHOICE] # 랜덤순회가 아닌, 반복순회로 변경 [income, expense]라서 income -> expense -> income ..순으로 생성됨
     )

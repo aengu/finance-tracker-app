@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from .managers import TransactionQuerySet
 
 class User(AbstractUser):
     pass
@@ -24,6 +25,8 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="금액")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name="카테고리")
     date = models.DateField(verbose_name="거래일")
+
+    objects = TransactionQuerySet.as_manager()
 
     def __str__(self):
         return f"{self.type} of {self.amount} on {self.date} by {self.user}"

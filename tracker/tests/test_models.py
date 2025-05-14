@@ -23,9 +23,9 @@ def test_queryset_get_expenses_method(transactions):
     )
 
 @pytest.mark.django_db
-def test_queryset_get_total_incomes_method(transactions):
-    total_incomes = Transaction.objects.get_total_incomes()
-    assert total_incomes == sum(t.amount for t in transactions if t.type == 'income')
+def test_queryset_get_total_income_method(transactions):
+    total_income = Transaction.objects.get_total_income()
+    assert total_income == sum(t.amount for t in transactions if t.type == 'income')
 
 @pytest.mark.django_db
 def test_queryset_get_total_expenses_method(transactions):

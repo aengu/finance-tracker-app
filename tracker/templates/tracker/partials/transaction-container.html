@@ -1,10 +1,37 @@
 {% load widget_tweaks %}
+{% load humanize %}
 <!-- grid container div 정의 -->
 <div class="flex flex-col  md:grid md:grid-cols-4 md:gap-4"
 id="transaction-container">
 
 <!-- 3/4 열은 거래내역 테이블 -->
 <div class="col-span-3">
+    <div class="my-4">
+        <h1 class="mt-4 mb-4 prose prose-2xl text-white">
+          Totals
+        </h1>
+
+        <table class="table">
+            <thead class="text-xs text-white uppercase">
+                <tr>
+                    <th>Total Income</th>
+                    <th>Total Expenses</th>
+                    <th>Net Income</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>{{ total_income|floatformat:2|intcomma }}</td>
+                    <td>{{ total_expenses|floatformat:2|intcomma }}</td>
+                    <td>{{ net_income|floatformat:2|intcomma }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h1 class="mt-8 mb-4 prose prose-2xl text-white">
+        Transactions
+    </h1>
     {% if filter.qs %}
     <table class="table">
         <thead class="text-xs text-white uppercase">
@@ -13,6 +40,7 @@ id="transaction-container">
                 <th class="px-6 py-3">Category</th>
                 <th class="px-6 py-3">Type</th>
                 <th class="px-6 py-3">Amount</th>
+                <th class="px-6 py-3">Total</th>
             </tr>
         </thead>
 

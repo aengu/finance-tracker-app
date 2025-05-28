@@ -40,7 +40,6 @@ id="transaction-container">
                 <th class="px-6 py-3">Category</th>
                 <th class="px-6 py-3">Type</th>
                 <th class="px-6 py-3">Amount</th>
-                <th class="px-6 py-3">Total</th>
             </tr>
         </thead>
 
@@ -67,10 +66,21 @@ id="transaction-container">
     <form htmx-get="{% url 'transaction_list' %}"
         htmx-target="#transaction-container"
         htmx-swap="outerHTML"
-         class="flex items-end gap-2">
-        <div class="form-control">
+        class="items-end gap-2">
+        <div class="mb-2 form-control">
             {{ filter.form.transaction_type|add_label_class:"label text-white" }}
             {% render_field filter.form.transaction_type class="select bg-gray-50 text-gray-900" %}
+        </div>
+        <div class="mb-2 form-control">
+            {{ filter.form.start_date|add_label_class:"label text-white" }}
+            {% render_field filter.form.start_date class="input bg-gray-50 text-gray-900" %}
+        </div>
+        <div class="mb-2 form-control">
+            {{ filter.form.end_date|add_label_class:"label text-white" }}
+            {% render_field filter.form.end_date class="input bg-gray-50 text-gray-900" %}
+        </div>
+        <div class="mb-4 form-control">
+            {% render_field filter.form.category class="text-green-500 border-gray-300 rounded focus:ring-green-500" %}
         </div>
         <button class="btn btn-success">
             filter

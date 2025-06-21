@@ -13,7 +13,7 @@ def test_total_values_appear_on_list_page(user_transactions, client):
     expense_total = sum(t.amount for t in user_transactions if t.type == 'expense')
     net = income_total - expense_total
 
-    response = client.get(reverse('transaction_list'))
+    response = client.get(reverse('transaction-list'))
     assert response.context['total_income'] == income_total
     assert response.context['total_expenses'] == expense_total
     assert response.context['net_income'] == net
@@ -26,7 +26,7 @@ def test_transaction_type_filter1(user_transactions, client):
 
     # income check
     GET_params = {'transaction_type': 'income'}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
     print(qs._result_cache)
@@ -35,7 +35,7 @@ def test_transaction_type_filter1(user_transactions, client):
 
     # expense check
     GET_params = {'transaction_type': 'expense'}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
     for tr in qs:
@@ -50,14 +50,14 @@ def test_transaction_type_filter2(user_transactions, client):
 
     # income check
     GET_params = {'transaction_type': 'income'}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
     assert not qs.filter(type='expense').exists()
 
     # expense check
     GET_params = {'transaction_type': 'expense'}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
     assert not qs.filter(type='income').exists()
@@ -70,7 +70,7 @@ def test_start_end_date_filter(user_transactions, client):
     # start date check
     start_date_cutoff = datetime.now().date() - timedelta(days=120)
     GET_params = {'start_date': start_date_cutoff}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
 
@@ -80,7 +80,7 @@ def test_start_end_date_filter(user_transactions, client):
     # end date check
     end_date_cutoff = datetime.now().date() + timedelta(days=120)
     GET_params = {'end_date': end_date_cutoff}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
 
@@ -95,7 +95,7 @@ def test_category_filter(user_transactions, client):
     # 첫 번째, 두 번째 category pk 가져오기
     category_pks = Category.objects.all()[:2].values_list('pk', flat=True)
     GET_params = {'category': category_pks}
-    response = client.get(reverse('transaction_list'), GET_params)
+    response = client.get(reverse('transaction-list'), GET_params)
 
     qs = response.context['filter'].qs
 

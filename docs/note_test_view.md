@@ -8,7 +8,7 @@
 
         # income check
         GET_params = {'transaction_type': 'income'}
-        response = client.get(reverse('transaction_list'), GET_params)
+        response = client.get(reverse('transaction-list'), GET_params)
 
         qs = response.context['filter'].qs
         for tr in qs:
@@ -32,7 +32,7 @@
 
         # htmx 요청이 있는 경우, 템플릿의 일부분만 반환 
         if request.htmx:
-            return render(request, 'tracker/particials/transaction-container.html', context)
+            return render(request, 'tracker/partials/transaction-container.html', context)
         
         return render(request, 'tracker/transaction-list.html', context)
     ```

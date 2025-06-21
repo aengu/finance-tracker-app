@@ -4,5 +4,6 @@ from tracker import views
 
 urlpatterns = [
     path("", views.index, name='index'),
-    path("transactions_list", views.transaction_list, name='transaction_list'),
+    path("transactions/", views.transaction_list, name='transaction-list'),
+    path("transactions/create/", views.create_transaction, name='create-transaction'),
 ]

@@ -11,6 +11,10 @@
     <div class="mb-2 form-control">
         {{form.amount|add_label_class:"label text-white"}}
         {% render_field form.amount class="input text-black" %}
+
+        {% for error in form.amount.errors %}
+            <p class="text-red-400 mt-1"> {{ error }}</p>
+        {% endfor %}
     </div>
     <div class="mb-2 form-control">
         {{form.date|add_label_class:"label text-white"}}
@@ -21,6 +25,9 @@
         {% render_field form.category class="text-green-500 border-gray-300 rounded focus:ring-green-500" %}
     </div>
     <button class="btn btn-success">
-        add
+        추가
+    </button>
+    <button class="btn btn-error" hx-get="{% url 'transaction-list' %}" hx-push-url="true" hx-target="#transaction-block">
+        취소
     </button>
 </form>

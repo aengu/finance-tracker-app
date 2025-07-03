@@ -4,7 +4,7 @@ from tracker.models import User
 from django.conf import settings
 """
 - 이렇게 고정(fixture)한 메서드는 다른 테스트에서도 기본적으로 사용할 수 있다
-- 테스트에서 사용하는 법: 그냥 함수명을 테스트 함수의 매개변수로 넣으면 됨
+- 테스트에서 사용하는 법: 그냥 함수명을 테스트 함수의 매개변수로 넣으면 됨 (import로 가져오지 않아도 된다)
 """
 
 @pytest.fixture(autouse=True)
@@ -20,3 +20,17 @@ def transactions():
 def user_transactions():
     test_user = UserFactory()
     return TransactionFactory.create_batch(20, user=test_user) # 생성된 트렉젝션의 모든 user가 test_user로 연결됨
+
+@pytest.fixture
+def user():
+    return UserFactory()
+
+@pytest.fixture
+def transaction_dict_params(user): # 여기서 user은 위에 선언한 fixture
+    transaction = TransactionFactory.create(user=user)
+    return {
+        'type': transaction.type,
+        'category': transaction.category_id,
+        'date': transaction.date,
+        'amount': transaction.amount,
+    }

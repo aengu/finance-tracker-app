@@ -21,8 +21,8 @@ def query_debugger(func):
         print(f"🕒 Time: {total_time:.4f}s")
         print(f"📦 Query Count: {num_queries}")
 
-        for i, query in enumerate(connection.queries, start=1):
-            print(f"  {i}. {query['sql']} ({query['time']}s)")
+        # for i, query in enumerate(connection.queries, start=1):
+        #     print(f"  {i}. {query['sql']} ({query['time']}s)")
 
         return result
     return wrapper

@@ -1,12 +1,12 @@
 {% load widget_tweaks %}
 <h1 class="mt-8 mb-4 prose prose-2xl text-white">
-    Create Transaction
+    Update Transaction
 </h1>
 
-<form hx-post="{% url 'create-transaction' %}">
+<form hx-post="{% url 'update-transaction' transaction.pk %}">
     {% include 'tracker/partials/transaction-form.html' %}
     <button class="btn btn-success">
-        추가
+        수정
     </button>
     <button class="btn btn-error" hx-get="{% url 'transaction-list' %}" hx-push-url="true" hx-target="#transaction-block">
         취소

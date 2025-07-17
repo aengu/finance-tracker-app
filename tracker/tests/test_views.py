@@ -110,7 +110,7 @@ def test_category_filter(user_transactions, client):
 
 @pytest.mark.django_db
 def test_add_transaction_request(user, transaction_dict_params, client):
-    """ """
+    """트랜잭션 추가 기능 테스트. 생성요청 전 후로 전체 트랜잭션 갯수 비교"""
     client.force_login(user)
     user_transaction_count = Transaction.objects.filter(user=user).count()
 
@@ -132,7 +132,7 @@ def test_cannot_add_transaction_with_nagative_amount(
     user,
     transaction_dict_params,
     client):
-    """ """
+    """amount에 음수를 넣고 생성 요청 후, 전체 트랜잭션 갯수의 변화가 없는지 확인"""
     client.force_login(user)
     user_transaction_count = Transaction.objects.filter(user=user).count()
 
@@ -148,3 +148,26 @@ def test_cannot_add_transaction_with_nagative_amount(
     assertTemplateUsed(response, 'tracker/partials/create-transaction.html')
     # 응답의 헤더에 retarget속성이 설정되어 있는지 확인
     assert 'HX-Retarget' in response.headers
+
+@pytest.mark.django_db
+def test_update_transaction_request(user, transaction_dict_params, client):
+    """ """
+    client.force_login(user)
+    # transaction_dict_params fixture를 선언하면서 인스턴스 하나 만들었음
+    assert Transaction.objects.filter(user = user).count() == 1
+
+    transaction = Transaction.objects.first()
+    now = datetime.now().date()
+    # dict params을 수정하여 post 요청으로 트랜잭션을 수정
+    transaction_dict_params['amount'] = 99999
+    transaction_dict_params['date'] = now
+    response = client.post(
+        reverse('update-transaction', kwargs={'pk': transaction.id}),
+        transaction_dict_params,
+    )
+
+    # 요청이 업데이트 되었는지 확인하고 새로운 트랜잭션이 생성되지 않았는지 확인
+    assert Transaction.objects.filter(user = user).count() == 1
+    assert Transaction.objects.first().amount == 99999
+    # assert Transaction.objects.first().date == now
+

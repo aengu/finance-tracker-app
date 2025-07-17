@@ -37,6 +37,8 @@ def transaction_list(request):
 - 실제로 요청 헤더에 'HX-Retarget' : target 이렇게 설정됨
 - 주로 form의 유효성 검사나, 부분 UI 갱신에 사용된다.
 """
+
+@login_required
 def create_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST)
@@ -54,3 +56,26 @@ def create_transaction(request):
             return retarget(response, '#transaction-block')
     context = {'form': TransactionForm()}
     return render(request, 'tracker/partials/create-transaction.html', context)
+
+
+@login_required
+def update_transaction(request, pk:int):
+
+    # 별 거 아니지만 이런 update 요청 받을 때 user=request.user인지도 꼭 확인해야 한다.
+    transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction)
+
+        if form.is_valid():
+            transaction = form.save(commit=False)
+            transaction.save()
+            context = {'msg': '성공적으로 수정 되었습니다.'}
+
+            return render(request, 'tracker/partials/transaction-success.html', context)
+        else:
+            context = {'form': form, 'transction': transaction}
+            response =  render(request, 'tracker/partials/update-transaction.html', context)
+            return retarget(response, '#transaction-block')
+    context = {'form': TransactionForm(instance=transaction), 'transaction':transaction}
+    return render(request, 'tracker/partials/update-transaction.html', context)

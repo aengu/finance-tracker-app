@@ -151,7 +151,7 @@ def test_cannot_add_transaction_with_nagative_amount(
 
 @pytest.mark.django_db
 def test_update_transaction_request(user, transaction_dict_params, client):
-    """ """
+    """거래내역 수정 메서드 동작 확인"""
     client.force_login(user)
     # transaction_dict_params fixture를 선언하면서 인스턴스 하나 만들었음
     assert Transaction.objects.filter(user = user).count() == 1
@@ -169,5 +169,16 @@ def test_update_transaction_request(user, transaction_dict_params, client):
     # 요청이 업데이트 되었는지 확인하고 새로운 트랜잭션이 생성되지 않았는지 확인
     assert Transaction.objects.filter(user = user).count() == 1
     assert Transaction.objects.first().amount == 99999
-    # assert Transaction.objects.first().date == now
+    assert Transaction.objects.first().date == now
 
+@pytest.mark.django_db
+def test_delete_transaction_request(user, transaction_dict_params, client):
+    """거래내역 삭제 메서드 동작 확인"""
+    client.force_login(user)
+
+    assert Transaction.objects.filter(user = user).count() == 1
+    transaction = Transaction.objects.first()
+    response = client.delete(
+        reverse('delete-transaction', kwargs={'pk': transaction.id})
+    )
+    assert Transaction.objects.filter(user = user).count() == 0

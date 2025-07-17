@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django_htmx.http import retarget
 from .models import Transaction, Category
 from .filters import TransactionFilter
@@ -79,3 +80,11 @@ def update_transaction(request, pk:int):
             return retarget(response, '#transaction-block')
     context = {'form': TransactionForm(instance=transaction), 'transaction':transaction}
     return render(request, 'tracker/partials/update-transaction.html', context)
+
+@login_required
+@require_http_methods(["DELETE"]) # 명시된 http 메서드만  허용하는 데코레이터
+def delete_transaction(request, pk:int):
+    transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+    transaction.delete()
+    context = {'msg': f"{transaction.date}일자의 {transaction.amount}원 거래내역이 성공적으로 삭제 되었습니다."}
+    return render(request, 'tracker/partials/transaction-success.html', context)

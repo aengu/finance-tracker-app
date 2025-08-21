@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django_htmx.http import retarget
+from django.core.paginator import Paginator
+from django.conf import settings
 from .models import Transaction, Category
 from .filters import TransactionFilter
 from .forms import TransactionForm
@@ -16,9 +18,14 @@ def transaction_list(request):
         request.GET,
         queryset=Transaction.objects.filter(user=request.user).select_related('category')
     )
+    page = int(request.GET.get('page', 1))
+
+    paginator = Paginator(transaction_filter.qs, settings.PAGE_SIZE)
+    transaction_page = paginator.page(page)
     total_income = transaction_filter.qs.get_total_income()
     total_expenses = transaction_filter.qs.get_total_expenses()
     context = {
+        'transactions': transaction_page, 
         'filter' : transaction_filter,
         'total_income' : total_income,
         'total_expenses': total_expenses,
@@ -27,6 +34,8 @@ def transaction_list(request):
 
     # htmx 요청이 있는 경우, 템플릿의 일부분만 반환 
     if request.htmx:
+        if page > 1: # 무한스크롤 요청인 경우
+            return render(request, 'tracker/partials/transaction-container.html#transaction-partial', context)
         return render(request, 'tracker/partials/transaction-container.html', context)
     
     return render(request, 'tracker/transaction-list.html', context)

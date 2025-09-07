@@ -66,6 +66,7 @@ id="transaction-container">
                         {% comment %}hx-get="{% url 'transaction-list'%}?page={{transactions.next_page_number}}"{% endcomment %}
                         {% comment %}hx-include="#filter-form"{% endcomment %}
                         hx-trigger="revealed"
+                        hx-indicator="#spinner"
                         hx-swap="afterend">
                     {% else %}
                     <tr>
@@ -95,16 +96,21 @@ id="transaction-container">
                     </tr>
                 {% endfor %}
                 {% if not transactions.has_next %}
-                <tr>aaaa</tr>
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-400">
+                            모든 거래 내역을 조회했습니다.
+                        </td>
+                    </tr>
                 {% endif %}
             {% endpartialdef %}
         </tbody>
     </table>
     {% else %}
         <p class="text-2xl text-white">
-            No transactions found
+            조회된 거래내역이 없습니다.
         </p>
     {% endif %}
+    <span id="spinner" class="mx-auto block loading loading-spinner loading-lg htmx-indicator"></span>
 </div>
 
 <!-- 1/4 열은 필터 폼 -->
@@ -135,5 +141,4 @@ id="transaction-container">
         </button>
     </form>
 </div>
-
 </div>

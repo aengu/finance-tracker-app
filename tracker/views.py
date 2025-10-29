@@ -7,6 +7,7 @@ from django.conf import settings
 from .models import Transaction, Category
 from .filters import TransactionFilter
 from .forms import TransactionForm
+from .charting import plot_income_expenses_bar_chart, plot_category_pie_chart
 
 # Create your views here.
 def index(request):
@@ -91,9 +92,33 @@ def update_transaction(request, pk:int):
     return render(request, 'tracker/partials/update-transaction.html', context)
 
 @login_required
-@require_http_methods(["DELETE"]) # 명시된 http 메서드만  허용하는 데코레이터
+@require_http_methods(["DELETE"]) # 명시된 http 메서드만 허용하는 데코레이터
 def delete_transaction(request, pk:int):
     transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
     transaction.delete()
     context = {'msg': f"{transaction.date}일자의 {transaction.amount}원 거래내역이 성공적으로 삭제 되었습니다."}
     return render(request, 'tracker/partials/transaction-success.html', context)
+
+
+@login_required 
+def transaction_charts(request):
+    transaction_filter = TransactionFilter(
+        request.GET,
+        queryset=Transaction.objects.filter(user=request.user).select_related('category')
+    )
+
+    bar_chart = plot_income_expenses_bar_chart(transaction_filter.qs)
+    income_pie_chart = plot_category_pie_chart(transaction_filter.qs.filter(type='income'), '카테고리별 수익합계')
+    expense_pie_chart = plot_category_pie_chart(transaction_filter.qs.filter(type='expense'), '카테고리별 지출합계')
+
+    context = {
+        'filter': transaction_filter,
+        'income_expense_bar_chart':bar_chart.to_html(full_html=False),
+        'income_pie_chart': income_pie_chart.to_html(full_html=False),
+        'expense_pie_chart': expense_pie_chart.to_html(full_html=False),
+    }
+    # htmx요청인 경우 컨테이너부분만 로드
+    if request.htmx:
+        return render(request, 'tracker/partials/charts-container.html', context)
+    
+    return render(request, 'tracker/charts.html', context)

@@ -1,5 +1,5 @@
 # 💰 거래내역 조회 앱 (Finance Tracker)
-
+![설명 텍스트](https://github.com/aengu/finance-tracker-app/blob/develop/실행화면.gif)
 > Django + HTMX + Plotly 기반의 개인 재무 관리 웹 애플리케이션  
 > 카테고리별 수입/지출 내역을 시각화하고, 효율적으로 관리할 수 있도록 만든 프로젝트입니다.
 

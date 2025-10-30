@@ -182,3 +182,141 @@ def test_delete_transaction_request(user, transaction_dict_params, client):
         reverse('delete-transaction', kwargs={'pk': transaction.id})
     )
     assert Transaction.objects.filter(user = user).count() == 0
+
+@pytest.mark.django_db
+def test_transaction_charts_page_requires_login(client):
+    """차트 페이지에 로그인 없이 접근 시 리다이렉트되는지 테스트"""
+    response = client.get(reverse('transaction-charts'))
+    # 로그인 페이지로 리다이렉트되어야 함
+    assert response.status_code == 302
+    assert '/accounts/login/' in response.url
+
+@pytest.mark.django_db
+def test_transaction_charts_page_access(user_transactions, client):
+    """로그인 후 차트 페이지에 정상 접근되는지 테스트"""
+    user = user_transactions[0].user
+    client.force_login(user)
+
+    response = client.get(reverse('transaction-charts'))
+
+    assert response.status_code == 200
+    assertTemplateUsed(response, 'tracker/charts.html')
+
+@pytest.mark.django_db
+def test_transaction_charts_page_contains_all_charts(user_transactions, client):
+    """차트 페이지에 3개의 차트가 모두 포함되어 있는지 테스트"""
+    user = user_transactions[0].user
+    client.force_login(user)
+
+    response = client.get(reverse('transaction-charts'))
+
+    # context에 3개의 차트가 모두 있는지 확인
+    assert 'income_expense_bar_chart' in response.context
+    assert 'income_pie_chart' in response.context
+    assert 'expense_pie_chart' in response.context
+
+    # 각 차트가 HTML로 변환되어 있는지 확인
+    assert '<div' in response.context['income_expense_bar_chart']
+    assert '<div' in response.context['income_pie_chart']
+    assert '<div' in response.context['expense_pie_chart']
+
+@pytest.mark.django_db
+def test_transaction_charts_page_with_filter(user_transactions, client):
+    """차트 페이지에 필터가 적용되는지 테스트"""
+    user = user_transactions[0].user
+    client.force_login(user)
+
+    # income 타입만 필터링
+    GET_params = {'transaction_type': 'income'}
+    response = client.get(reverse('transaction-charts'), GET_params)
+
+    assert response.status_code == 200
+    # 필터가 context에 포함되어 있는지 확인
+    assert 'filter' in response.context
+    # 필터된 queryset이 income만 포함하는지 확인
+    qs = response.context['filter'].qs
+    assert not qs.filter(type='expense').exists()
+
+@pytest.mark.django_db
+def test_transaction_charts_htmx_request(user_transactions, client):
+    """htmx 요청 시 부분 템플릿만 반환되는지 테스트"""
+    user = user_transactions[0].user
+    client.force_login(user)
+
+    headers = {'HTTP_HX-Request': 'true'}
+    response = client.get(reverse('transaction-charts'), **headers)
+
+    assert response.status_code == 200
+    # htmx 요청 시 부분 템플릿이 사용되는지 확인
+    assertTemplateUsed(response, 'tracker/partials/charts-container.html')
+
+@pytest.mark.django_db
+def test_transaction_charts_page_shows_user_data_only(client):
+    """차트 페이지가 현재 로그인한 사용자의 데이터만 표시하는지 테스트"""
+    from tracker.factories import UserFactory, TransactionFactory
+
+    # 두 명의 사용자 생성
+    user1 = UserFactory()
+    user2 = UserFactory()
+
+    # 각 사용자의 거래 생성
+    user1_transactions = TransactionFactory.create_batch(10, user=user1)
+    user2_transactions = TransactionFactory.create_batch(10, user=user2)
+
+    # user1로 로그인
+    client.force_login(user1)
+    response = client.get(reverse('transaction-charts'))
+
+    # user1의 데이터만 필터링되었는지 확인
+    qs = response.context['filter'].qs
+    assert qs.count() == 10
+    assert all(t.user == user1 for t in qs)
+
+@pytest.mark.django_db
+def test_transaction_charts_with_date_filter(user_transactions, client):
+    """차트 페이지에 날짜 필터가 적용되는지 테스트"""
+    user = user_transactions[0].user
+    client.force_login(user)
+
+    # 120일 전부터의 거래만 필터링
+    start_date_cutoff = datetime.now().date() - timedelta(days=120)
+    GET_params = {'start_date': start_date_cutoff}
+    response = client.get(reverse('transaction-charts'), GET_params)
+
+    assert response.status_code == 200
+    qs = response.context['filter'].qs
+
+    # 필터링된 모든 거래가 start_date 이후인지 확인
+    for transaction in qs:
+        assert transaction.date >= start_date_cutoff
+
+@pytest.mark.django_db
+def test_transaction_charts_with_category_filter(user_transactions, client):
+    """차트 페이지에 카테고리 필터가 적용되는지 테스트"""
+    user = user_transactions[0].user
+    client.force_login(user)
+
+    # 첫 번째 카테고리로 필터링
+    category_pk = Category.objects.first().pk
+    GET_params = {'category': [category_pk]}
+    response = client.get(reverse('transaction-charts'), GET_params)
+
+    assert response.status_code == 200
+    qs = response.context['filter'].qs
+
+    # 필터링된 모든 거래가 해당 카테고리에 속하는지 확인
+    for transaction in qs:
+        assert transaction.category.pk == category_pk
+
+@pytest.mark.django_db
+def test_transaction_charts_with_no_data(user, client):
+    """거래 데이터가 없을 때 차트 페이지가 정상 작동하는지 테스트"""
+    client.force_login(user)
+
+    response = client.get(reverse('transaction-charts'))
+
+    # 데이터가 없어도 페이지는 정상적으로 렌더링되어야 함
+    assert response.status_code == 200
+    assert 'income_expense_bar_chart' in response.context
+    assert 'income_pie_chart' in response.context
+    assert 'expense_pie_chart' in response.context

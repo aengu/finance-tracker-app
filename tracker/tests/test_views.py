@@ -202,6 +202,12 @@ def test_transaction_charts_page_access(user_transactions, client):
     assert response.status_code == 200
     assertTemplateUsed(response, 'tracker/charts.html')
 
+"""
+사실 key, value값 둘 다 검증할 필요 없이 value만 검증해도 되긴 된다.
+value검증할 때 대응하는 Key가 없으면 keyerror가 뜨면서 테스트가 실패하니까.
+근데 이건 코테가 아니고 테스트코드니까 각 테스트가 어떤 이유로 실패했는지의 에러메세지도 중요하다
+그래서 keyerror대신에 명확한 assertionerror를 유도하기 위해 저렇게 풀어쓴다고 한다,,,
+"""
 @pytest.mark.django_db
 def test_transaction_charts_page_contains_all_charts(user_transactions, client):
     """차트 페이지에 3개의 차트가 모두 포함되어 있는지 테스트"""
@@ -258,8 +264,8 @@ def test_transaction_charts_page_shows_user_data_only(client):
     user2 = UserFactory()
 
     # 각 사용자의 거래 생성
-    user1_transactions = TransactionFactory.create_batch(10, user=user1)
-    user2_transactions = TransactionFactory.create_batch(10, user=user2)
+    TransactionFactory.create_batch(10, user=user1)
+    TransactionFactory.create_batch(10, user=user2)
 
     # user1로 로그인
     client.force_login(user1)

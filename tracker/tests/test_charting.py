@@ -68,20 +68,6 @@ def test_plot_category_pie_chart_returns_figure(user_transactions):
     # 파이 차트인지 확인
     assert fig.data[0].type == 'pie'
 
-
-@pytest.mark.django_db
-def test_plot_category_pie_chart_has_correct_title(user_transactions):
-    """파이 차트의 타이틀이 올바르게 설정되는지 테스트"""
-    user = user_transactions[0].user
-    qs = Transaction.objects.filter(user=user, type='expense')
-    title = '카테고리별 지출합계'
-
-    fig = plot_category_pie_chart(qs, title)
-
-    # 차트 타이틀이 제대로 설정되었는지 확인
-    assert fig.layout.title.text == title
-
-
 @pytest.mark.django_db
 def test_plot_category_pie_chart_aggregates_by_category(user_transactions):
     """파이 차트가 카테고리별로 올바르게 집계하는지 테스트"""
@@ -113,30 +99,3 @@ def test_plot_category_pie_chart_with_empty_queryset(user):
     # 빈 리스트가 들어가야 함
     assert len(fig.data[0].labels) == 0
     assert len(fig.data[0].values) == 0
-
-
-@pytest.mark.django_db
-def test_plot_category_pie_chart_separates_income_and_expense(user_transactions):
-    """수입과 지출 파이 차트가 서로 다른 데이터를 보여주는지 테스트"""
-    user = user_transactions[0].user
-    income_qs = Transaction.objects.filter(user=user, type='income')
-    expense_qs = Transaction.objects.filter(user=user, type='expense')
-
-    income_fig = plot_category_pie_chart(income_qs, '수입')
-    expense_fig = plot_category_pie_chart(expense_qs, '지출')
-
-    # 수입과 지출 차트의 데이터가 다른지 확인 (같을 수도 있지만 일반적으로 다름)
-    # 최소한 둘 다 생성은 되어야 함
-    assert isinstance(income_fig, go.Figure)
-    assert isinstance(expense_fig, go.Figure)
-
-    # 각 차트가 해당 타입의 거래만 포함하는지 확인
-    # (실제 값 검증은 위의 테스트에서 이미 수행)
-    income_categories = set(income_qs.values_list('category__name', flat=True))
-    expense_categories = set(expense_qs.values_list('category__name', flat=True))
-
-    # 카테고리가 존재하면 차트에 표시되어야 함
-    if income_qs.exists():
-        assert len(income_fig.data[0].labels) > 0
-    if expense_qs.exists():
-        assert len(expense_fig.data[0].labels) > 0

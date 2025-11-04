@@ -57,6 +57,7 @@ finance_project/
 ├── templatetags/
 │ └── custom_filter.py # 사용자 정의 템플릿 필터
 ├── tests/
+│ ├── test_charting.py # 차트 함수 단위 테스트
 │ ├── test_views.py
 │ ├── test_models.py
 │ └── conftest.py
@@ -84,13 +85,13 @@ python manage.py runserver
 ---
 
 ## 💡 설계 포인트
--HTMX 활용: Django 템플릿 기반에서도 SPA 수준의 가벼운 비동기 UX 구현
--ORM Aggregation 최적화: annotate, aggregate, Sum 등을 활용한 효율적 집계
--테스트 주도 개발: pytest + Factory Boy를 이용한 단위 테스트 기반 개발
+- HTMX 활용: Django 템플릿 기반에서도 SPA 수준의 가벼운 비동기 UX 구현
+- ORM Aggregation 최적화: annotate, aggregate, Sum 등을 활용한 효율적 집계
+- 테스트 주도 개발: pytest + Factory Boy를 이용한 단위 테스트 기반 개발
 
 ---
 
 ## 🧭 배운 점 & 회고
-HTMX를 통해 Django에서도 React 수준의 인터랙션을 구현할 수 있음을 체험
-ORM 집계 함수와 queryset 최적화에 대한 이해 심화
-데이터 시각화(Plotly)를 통해 단순 CRUD를 넘는 “사용자 중심” 인터페이스를 고민하게 됨
+- HTMX를 통해 Django에서도 React 수준의 인터랙션을 구현할 수 있음을 체험
+- ORM 집계 함수와 queryset 최적화에 대한 이해 심화
+- 데이터 시각화(Plotly)를 통해 단순 CRUD를 넘는 "사용자 중심" 인터페이스를 고민하게 됨

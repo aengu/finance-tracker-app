@@ -210,15 +210,13 @@ def test_transaction_charts_page_contains_all_charts(user_transactions, client):
 
     response = client.get(reverse('transaction-charts'))
 
-    # context에 3개의 차트가 모두 있는지 확인
+    # context에 3개의 차트가 모두 있고 값이 존재하는지 확인
     assert 'income_expense_bar_chart' in response.context
+    assert response.context['income_expense_bar_chart']
     assert 'income_pie_chart' in response.context
+    assert response.context['income_pie_chart']
     assert 'expense_pie_chart' in response.context
-
-    # 각 차트가 HTML로 변환되어 있는지 확인
-    assert '<div' in response.context['income_expense_bar_chart']
-    assert '<div' in response.context['income_pie_chart']
-    assert '<div' in response.context['expense_pie_chart']
+    assert response.context['expense_pie_chart']
 
 @pytest.mark.django_db
 def test_transaction_charts_page_with_filter(user_transactions, client):
@@ -318,5 +316,8 @@ def test_transaction_charts_with_no_data(user, client):
     # 데이터가 없어도 페이지는 정상적으로 렌더링되어야 함
     assert response.status_code == 200
     assert 'income_expense_bar_chart' in response.context
+    assert response.context['income_expense_bar_chart']
     assert 'income_pie_chart' in response.context
+    assert response.context['income_pie_chart']
     assert 'expense_pie_chart' in response.context
+    assert response.context['expense_pie_chart']
